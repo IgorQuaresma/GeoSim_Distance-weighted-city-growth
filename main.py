@@ -3,12 +3,12 @@ from pcraster.framework import *
 
 print('BEEP BEEP BOOP loading . . . ')
 
+# Rybski et al use gridsize 630 x 630
 GRID = 630
 
 class CityGrowthModel(DynamicModel):
   def __init__(self):
     DynamicModel.__init__(self)
-    # Rybski et al use gridsize 630 x 630
     setclone(GRID,GRID,1,0,0)
     #setclone('clone.map')
 
@@ -20,28 +20,34 @@ class CityGrowthModel(DynamicModel):
 
     # set single central cell to occupied
     self.uniqueMap = uniqueid(self.initialMap)
-    self.report(self.uniqueMap, 'unique')
-    self.initialMap = ifthenelse(self.uniqueMap == (GRID**2 - GRID/2), scalar(1), scalar(0))
-
-    self.report(self.initialMap, 'initial')
+    self.occupied = ifthenelse(self.uniqueMap == (GRID**2 / 2 - GRID/2), boolean(1), boolean(0))
+    self.report(self.occupied, 'initial')
 
   def dynamic(self):
+    '''
+    already occupied cells don't change
+    unoccupied cells become occupied when Rybski et al Eq(1) evaluates to 1:
+    '''
+    # need to consider all cells where k=/= j:
+    # however, no need to exclude any cells as distance d will be 0
+    j = self.occupied
+    distances = spread(j, scalar(1), scalar(1))
+
+    num = maptotal(scalar(self.occupied) * distances**self.gamma)
+    denom = maptotal(distances**self.gamma)
+    #new_occupied = self.occupied
+
+    q = num / denom
+    c = 1 / mapmaximum(q)
+    qj = c * q
+    self.report(qj, 'output/q')
+    self.report(distances, 'output/distance')
     pass
 
-nrOfTimeSteps=100
+nrOfTimeSteps=10#100
 CGModel = CityGrowthModel()
 dynamicModel = DynamicFramework(CGModel,nrOfTimeSteps)
 dynamicModel.run()
 
 print()
 
-
-
-
-#self.initialMap = ifthenelse(pcrand(pcrgt(ycoordinate(self.initialMap), 5), pcrgt(xcoordinate(self.initialMap), 5)), scalar(1), scalar(0))
-#self.initialMap = ifthenelse(pcrand(pcrand(
-#  ycoordinate(self.initialMap) >= 5, 
-#  ycoordinate(self.initialMap) <= 6), pcrand( 
-#  xcoordinate(self.initialMap) >= 5,
-#  xcoordinate(self.initialMap) <= 6), 
-#  ), scalar(1), scalar(0))
