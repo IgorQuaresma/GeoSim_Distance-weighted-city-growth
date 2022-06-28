@@ -1,0 +1,9 @@
+# Ignore everything
+*
+
+!.gitignore
+!main.py
+!clone.map
+!initial.map
+!unigue.map
+!README.md
