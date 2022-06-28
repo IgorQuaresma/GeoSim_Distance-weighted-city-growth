@@ -16,7 +16,7 @@
 ## Conceptual Model
 <p>
   The model is a cellular automaton, and each cell can be either empty (0) or occupied (1). Occupied in this case means that it is part of an urban area. The model then is initiated by starting with an empty grid of size N x N, and by having a single central cell as occupied. The central cell location is at (N/2, N/2). The transition function is defined by the probability that a cell will be occupied, which is described as follows, 
-<img src="./img/image2.png"><br>where:<br><img src="./img/image4.png"><br>
+<br><img src="./img/image2.png"><br>where:<br><img src="./img/image4.png"><br>
   
 So essentially, the probability of a cell becoming part of the city is solely determined by the weighted sum of the Euclidean distance to all the other cells. Taking into account the first law of geography, the model assumes that the closer a cell is to a city, the more likely it is to turn into a city itself. The weight per grid cell is represented by the exponent gamma, the effects of which we will study in this project. 
 </p>
