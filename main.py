@@ -5,14 +5,14 @@ import os
 print('BEEP BEEP BOOP loading . . . ')
 
 # Rybski et al use gridsize 630 x 630 and gamma between 2.0 and 3.0
-GRID = 100 #630
+GRID = 64 #630 don't use odd numbers
 GAMMA = 2.5
 
 class CityGrowthModel(DynamicModel):
   def __init__(self):
     DynamicModel.__init__(self)
     setclone(GRID,GRID,1,0,0)
-    setglobaloption("unitcell")
+    #setglobaloption("unitcell")
 
     # check whether output directories exist. If not, make them:
     for folder in ['dist', 'output']:
@@ -26,6 +26,7 @@ class CityGrowthModel(DynamicModel):
     
     # instantiate empty map (all cells unoccupied) and assign ID for every cell:
     self.uniqueMap = uniqueid(boolean(1))
+    self.report(self.uniqueMap, 'uniqueid')
 
     # set single central cell to occupied
     self.occupied = ifthenelse(self.uniqueMap == (GRID**2 / 2 - GRID/2), boolean(1), boolean(0))
@@ -33,20 +34,24 @@ class CityGrowthModel(DynamicModel):
 
     # create distance maps for each cell
     # first, check if distance maps for this gridsize already exist:
-    if len(os.listdir('dist/')) == self.totalCells:
-      print('Distance maps already exist')
+    existing_maps = len(os.listdir('dist/'))
+    if existing_maps == self.totalCells:
+      print('Distance maps already exist\nModel initialised')
     else:
+      if existing_maps > self.totalCells:
+        for map in os.listdir('dist/'):
+          os.remove(f'dist/{map}')
       # this can take ages so we track it:
       print(f'Model initialised\nCreating spreads for {self.totalCells} cells')
       ten_pct = int(self.totalCells / 10)
       one_pct = int(self.totalCells / 100)
       for cell in range(1, self.totalCells+1):
         self.report(spread(self.uniqueMap == cell, scalar(1), scalar(1)), f'dist/{cell}')
-        if self.totalCells % ten_pct == 0:
-          print(f'{self.totalCells % ten_pct}%')
-        elif self.totalCells % one_pct == 0:
-          print('+')
-        
+        if cell % one_pct == 0:
+          print(f'\t{round(cell / self.totalCells * 100, 2)}%', end='\r')
+        #elif cell % one_pct == 0:
+        #  print('+')
+      print('\t100.00%')
 
 
   def dynamic(self):
@@ -76,7 +81,8 @@ class CityGrowthModel(DynamicModel):
         prob = ifthenelse(is_cell_j, qj_c, 0)
         probMap = probMap + prob
 
-    c = 1 / mapmaximum(probMap)
+    # no divide by zero, use max
+    c = 1 / max(mapmaximum(probMap),1e-10)
     probMap = c * probMap
 
     self.report(probMap, 'output/probMap')
