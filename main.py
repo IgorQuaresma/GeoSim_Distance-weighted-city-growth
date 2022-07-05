@@ -93,6 +93,10 @@ class CityGrowthModel(DynamicModel):
     self.occupied = pcror(self.occupied, new_occupied)
     self.report(self.occupied, 'output/occ')
 
+    #total number of occupied cells
+    self.number_occupied = maptotal(scalar(self.occupied))
+    self.report(self.number_occupied, 'output/n_occ')
+
 nrOfTimeSteps=10#100
 CGModel = CityGrowthModel()
 dynamicModel = DynamicFramework(CGModel,nrOfTimeSteps)
