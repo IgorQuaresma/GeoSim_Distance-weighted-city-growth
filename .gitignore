@@ -1,8 +1,5 @@
-dist/*
-output/*
+data/*
+!clone.map
 
 .vscode/
 *.code-workspace
-
-uniqueid.map
-initial.map
