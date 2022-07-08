@@ -1,5 +1,5 @@
 data/*
-!clone.map
+!data/.gitkeep
 
 .vscode/
 *.code-workspace

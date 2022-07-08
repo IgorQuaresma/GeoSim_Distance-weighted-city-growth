@@ -5,7 +5,7 @@ from pcraster.framework import *
 
 
 # Rybski et al use gridsize 630 x 630 and gamma between 2.0 and 3.0
-GRID = 64 #630 don't use odd numbers
+GRID = 128  #630 don't use odd numbers
 GAMMA = 2.5
 GAMMA_STANDARD_DEVIATION = 0.5
 
@@ -54,6 +54,7 @@ class CityGrowthModel(DynamicModel, MonteCarloModel):
         #  print('+')
       print('\t100.00%')
 
+    # Create initial map, single central cell occupied 
     self.initial_map = ifthenelse(self.uniqueMap == (GRID**2 / 2 - GRID/2), boolean(1), boolean(0))
     self.report(self.initial_map, 'initial')
 
@@ -61,7 +62,7 @@ class CityGrowthModel(DynamicModel, MonteCarloModel):
     self.gamma = mapnormal() * GAMMA_STANDARD_DEVIATION + GAMMA # parameter value
     self.report(self.gamma, 'gamma')
 
-    # set single central cell to occupied
+    # Field for each realization
     self.occupied = self.initial_map
 
   def dynamic(self):
